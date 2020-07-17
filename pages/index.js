@@ -1,23 +1,42 @@
 import React, { useReducer, useEffect } from "react";
 import produce from "immer";
 
+import RandomGiphy from "../components/random-giphy";
+
 const config = {
   runs: 8,
-  run: [
+  activities: [
     {
-      activity: "get-ready",
+      message: <div>Gjør deg klar</div>,
       duration: 4,
     },
     {
-      activity: "up",
+      message: (
+        <div>
+          ↑<br />
+          Tåhev
+        </div>
+      ),
       duration: 4,
     },
     {
-      activity: "down",
+      message: (
+        <div>
+          Tåsenk
+          <br />↓
+        </div>
+      ),
       duration: 4,
     },
     {
-      activity: "relax",
+      message: (
+        <div>
+          Slapp av
+          <div>
+            <RandomGiphy />
+          </div>
+        </div>
+      ),
       duration: 60 * 2 - 4,
     },
   ],
@@ -25,7 +44,7 @@ const config = {
 
 const defaultState = {
   status: "idle",
-  activity: "",
+  activityIndex: 0,
   time: 0,
   run: 0,
   progress: 0,
@@ -46,7 +65,7 @@ const reducer = produce((draft, { type }) => {
       switch (draft.status) {
         case "idle": {
           draft.status = "running";
-          draft.activity = config.run[0].activity;
+          draft.activityIndex = 0;
           draft.time = 0;
           draft.progress = 0;
           draft.lastTick = Date.now();
@@ -75,19 +94,16 @@ const reducer = produce((draft, { type }) => {
         draft.time += Date.now() - draft.lastTick;
         draft.lastTick = Date.now();
 
-        const activityIndex = config.run.findIndex(
-          (r) => r.activity === draft.activity
-        );
-        const activity = config.run[activityIndex];
+        const activity = config.activities[draft.activityIndex];
         draft.progress = draft.time / 1000 / activity.duration;
 
         if (draft.progress > 1) {
-          const next = config.run[activityIndex + 1] || config.run[0];
-          draft.activity = next.activity;
+          draft.activityIndex++;
           draft.time = 0;
           draft.progress = 0;
 
-          if (config.run[0] === next) {
+          if (draft.activityIndex > config.activities.length + 1) {
+            draft.activityIndex = 0;
             draft.run++;
 
             if (draft.run >= config.runs) {
@@ -104,7 +120,7 @@ const reducer = produce((draft, { type }) => {
 });
 
 export default function IndexPage() {
-  const [{ status, activity, progress, run }, dispatch] = useReducer(
+  const [{ status, progress, activityIndex, run }, dispatch] = useReducer(
     reducer,
     defaultState
   );
@@ -146,20 +162,7 @@ export default function IndexPage() {
           <Progress progress={progress} />
           <div className="flex justify-center align-center py-10 text-4xl text-center">
             <div>
-              {activity === "get-ready" && "Gjør deg klar"}
-              {activity === "up" && (
-                <div>
-                  ↑<br />
-                  Tåhev
-                </div>
-              )}
-              {activity === "down" && (
-                <div>
-                  Tåsenk
-                  <br />↓
-                </div>
-              )}
-              {activity === "relax" && "Slapp av"}
+              {config.activities[activityIndex]?.message}
               <div className="p-4">
                 {run + 1} / {config.runs}
               </div>
