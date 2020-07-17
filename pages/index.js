@@ -18,7 +18,7 @@ const config = {
     },
     {
       activity: "relax",
-      duration: 60 * 2 - 5,
+      duration: 60 * 2 - 4,
     },
   ],
 };
@@ -89,6 +89,11 @@ const reducer = produce((draft, { type }) => {
 
           if (config.run[0] === next) {
             draft.run++;
+
+            if (draft.run >= config.runs) {
+              alert("Du er ferdig for i dag!");
+              draft.status = "idle";
+            }
           }
         }
       }
@@ -99,7 +104,7 @@ const reducer = produce((draft, { type }) => {
 });
 
 export default function IndexPage() {
-  const [{ status, activity, progress }, dispatch] = useReducer(
+  const [{ status, activity, progress, run }, dispatch] = useReducer(
     reducer,
     defaultState
   );
@@ -140,20 +145,25 @@ export default function IndexPage() {
         <div>
           <Progress progress={progress} />
           <div className="flex justify-center align-center py-10 text-4xl text-center">
-            {activity === "get-ready" && "Gjør deg klar"}
-            {activity === "up" && (
-              <span>
-                ↑<br />
-                Tåhev
-              </span>
-            )}
-            {activity === "down" && (
-              <span>
-                Tåsenk
-                <br />↓
-              </span>
-            )}
-            {activity === "relax" && "Slapp av"}
+            <div>
+              {activity === "get-ready" && "Gjør deg klar"}
+              {activity === "up" && (
+                <div>
+                  ↑<br />
+                  Tåhev
+                </div>
+              )}
+              {activity === "down" && (
+                <div>
+                  Tåsenk
+                  <br />↓
+                </div>
+              )}
+              {activity === "relax" && "Slapp av"}
+              <div className="p-4">
+                {run + 1} / {config.runs}
+              </div>
+            </div>
           </div>
         </div>
       )}
