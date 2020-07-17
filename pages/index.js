@@ -3,15 +3,37 @@ import produce from "immer";
 
 import RandomGiphy from "../components/random-giphy";
 
+function save(state) {
+  try {
+    localStorage.setItem(
+      "pvt.state",
+      JSON.stringify({
+        date: Date.now(),
+        state,
+      })
+    );
+  } catch (e) {}
+}
+
+function retrieve() {
+  try {
+    const state = localStorage.getItem("pvt.state");
+
+    return JSON.parse(state);
+  } catch (e) {}
+
+  return null;
+}
+
 const config = {
   runs: 8,
   activities: [
     {
-      message: <div>Gjør deg klar</div>,
+      message: () => <div>Gjør deg klar</div>,
       duration: 4,
     },
     {
-      message: (
+      message: () => (
         <div>
           ↑<br />
           Tåhev
@@ -20,7 +42,7 @@ const config = {
       duration: 4,
     },
     {
-      message: (
+      message: () => (
         <div>
           Tåsenk
           <br />↓
@@ -29,9 +51,18 @@ const config = {
       duration: 4,
     },
     {
-      message: (
-        <div>
-          Slapp av
+      message: ({ dispatch }) => (
+        <div style={{ lineHeight: 1 }}>
+          Slapp av...
+          <div style={{ marginTop: -10, marginBottom: 10 }}>
+            <a
+              className="link-button"
+              onClick={() => dispatch({ type: "skip" })}
+              style={{ fontSize: ".5em" }}
+            >
+              (hopp over)
+            </a>
+          </div>
           <div>
             <RandomGiphy />
           </div>
@@ -59,8 +90,12 @@ function Progress({ progress }) {
   );
 }
 
-const reducer = produce((draft, { type }) => {
+const reducer = produce((draft, { type, ...rest }) => {
   switch (type) {
+    case "setRun": {
+      draft.run = rest.run;
+      break;
+    }
     case "toggle": {
       switch (draft.status) {
         case "idle": {
@@ -87,6 +122,12 @@ const reducer = produce((draft, { type }) => {
       draft.status = "idle";
       draft.time = 0;
       draft.progress = 0;
+      draft.run = 0;
+      break;
+    }
+    case "skip": {
+      draft.activityIndex = 0;
+      draft.run++;
       break;
     }
     case "tick": {
@@ -111,6 +152,8 @@ const reducer = produce((draft, { type }) => {
               draft.status = "idle";
             }
           }
+
+          save(draft);
         }
       }
     }
@@ -132,8 +175,24 @@ export default function IndexPage() {
 
     const interval = setInterval(tick, 10);
 
+    const oldRun = retrieve();
+    if (oldRun) {
+      const today = new Date();
+      const oldDay = new Date(oldRun.date);
+
+      if (
+        today.getFullYear() === oldDay.getFullYear() &&
+        today.getMonth() === oldDay.getMonth() &&
+        today.getDate() === oldDay.getDate()
+      ) {
+        dispatch({ type: "setRun", run: oldRun.state.run });
+      }
+    }
+
     return () => clearInterval(interval);
   }, [dispatch]);
+
+  const activity = config.activities[activityIndex];
 
   return (
     <div>
@@ -160,9 +219,9 @@ export default function IndexPage() {
       {status !== "idle" && (
         <div>
           <Progress progress={progress} />
-          <div className="flex justify-center align-center py-10 text-4xl text-center">
+          <div className="flex justify-center align-center py-4 text-4xl text-center">
             <div>
-              {config.activities[activityIndex]?.message}
+              {activity?.message({ dispatch })}
               <div className="p-4">
                 {run + 1} / {config.runs}
               </div>
