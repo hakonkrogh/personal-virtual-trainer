@@ -86,6 +86,10 @@ const reducer = produce((draft, { type }) => {
           draft.activity = next.activity;
           draft.time = 0;
           draft.progress = 0;
+
+          if (config.run[0] === next) {
+            draft.run++;
+          }
         }
       }
     }
@@ -118,7 +122,7 @@ export default function IndexPage() {
           onClick={() => dispatch({ type: "toggle" })}
         >
           {status === "idle" && "Start"}
-          {status === "paused" && "Resume"}
+          {status === "paused" && "Gjenoppta"}
           {status === "running" && "Pause"}
         </button>
         <button
@@ -126,17 +130,27 @@ export default function IndexPage() {
           disabled={status === "idle"}
           onClick={() => dispatch({ type: "reset" })}
         >
-          Reset
+          Start på nytt
         </button>
       </div>
       {status !== "idle" && (
         <div>
           <Progress progress={progress} />
-          <div className="flex justify-center align-center py-10 text-4xl">
-            {activity === "get-ready" && "Get ready"}
-            {activity === "up" && "↑"}
-            {activity === "down" && "↓"}
-            {activity === "relax" && "Relax"}
+          <div className="flex justify-center align-center py-10 text-4xl text-center">
+            {activity === "get-ready" && "Gjør deg klar"}
+            {activity === "up" && (
+              <span>
+                ↑<br />
+                Tåhev
+              </span>
+            )}
+            {activity === "down" && (
+              <span>
+                ↓<br />
+                Tåsenk
+              </span>
+            )}
+            {activity === "relax" && "Slapp av"}
           </div>
         </div>
       )}
