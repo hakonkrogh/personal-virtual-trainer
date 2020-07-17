@@ -2,7 +2,16 @@
 @tailwind components;
 
 .btn-blue {
-  @apply bg-blue-500 text-white font-bold py-2 px-4 rounded;
+  @apply bg-blue-500 text-white font-bold py-3 px-6 rounded;
+}
+
+.btn-gray {
+  @apply bg-gray-300 font-bold py-3 px-6 rounded;
+}
+
+button[disabled] {
+  cursor: default;
+  opacity: 0.5;
 }
 
 .hero {
@@ -16,3 +25,16 @@
 }
 
 @tailwind utilities;
+
+.progress {
+  position: relative;
+  overflow: hidden;
+  height: 3vh;
+  display: flex;
+}
+
+.progress span {
+  height: 100%;
+  max-width: 100%;
+  @apply bg-blue-500;
+}
