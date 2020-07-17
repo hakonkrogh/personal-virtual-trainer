@@ -102,7 +102,7 @@ const reducer = produce((draft, { type }) => {
           draft.time = 0;
           draft.progress = 0;
 
-          if (draft.activityIndex > config.activities.length + 1) {
+          if (draft.activityIndex > config.activities.length - 1) {
             draft.activityIndex = 0;
             draft.run++;
 
