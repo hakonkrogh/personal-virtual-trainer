@@ -148,7 +148,6 @@ const reducer = produce((draft, { type, ...rest }) => {
             draft.run++;
 
             if (draft.run >= config.runs) {
-              alert("Du er ferdig for i dag!");
               draft.status = "idle";
             }
           }
@@ -216,6 +215,16 @@ export default function IndexPage() {
           Start på nytt
         </button>
       </div>
+
+      {run === config.runs - 1 && (
+        <div style={{ textAlign: "center" }}>
+          <h2 className="text-xl pb-2">Du er ferdig for dagen!</h2>
+          <div>
+            <RandomGiphy tag="Great job" />
+          </div>
+        </div>
+      )}
+
       {status !== "idle" && (
         <div>
           <Progress progress={progress} />
