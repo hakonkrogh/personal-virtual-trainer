@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-export default function RandomGiphy({ tag = "workout,fail" }) {
+export default function RandomGiphy({ tag = "workout,+fail" }) {
   const [image, setImage] = useState(null);
 
   async function getNew() {
