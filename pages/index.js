@@ -116,6 +116,9 @@ export default function IndexPage() {
 
   return (
     <div>
+      <div className="hero bg-blue-800 p-8">
+        <h1 className="title text-white">Personlig Virtuell Trener</h1>
+      </div>
       <div className="flex justify-center p-4 space-x-4">
         <button
           className="btn-blue w-32"
@@ -146,8 +149,8 @@ export default function IndexPage() {
             )}
             {activity === "down" && (
               <span>
-                ↓<br />
                 Tåsenk
+                <br />↓
               </span>
             )}
             {activity === "relax" && "Slapp av"}
