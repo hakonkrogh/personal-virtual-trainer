@@ -216,27 +216,29 @@ export default function IndexPage() {
         </button>
       </div>
 
-      {run === config.runs - 1 && (
+      {run === config.runs - 1 ? (
         <div style={{ textAlign: "center" }}>
           <h2 className="text-xl pb-2">Du er ferdig for dagen!</h2>
           <div>
             <RandomGiphy tag="Great job" />
           </div>
         </div>
-      )}
-
-      {status !== "idle" && (
-        <div>
-          <Progress progress={progress} />
-          <div className="flex justify-center align-center py-4 text-4xl text-center">
+      ) : (
+        <>
+          {status !== "idle" && (
             <div>
-              {activity?.message({ dispatch })}
-              <div className="p-4">
-                {run + 1} / {config.runs}
+              <Progress progress={progress} />
+              <div className="flex justify-center align-center py-4 text-4xl text-center">
+                <div>
+                  {activity?.message({ dispatch })}
+                  <div className="p-4">
+                    {run + 1} / {config.runs}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );
