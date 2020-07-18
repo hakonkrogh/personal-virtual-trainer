@@ -222,7 +222,7 @@ export default function IndexPage() {
         </button>
       </div>
 
-      {run === config.runs - 1 ? (
+      {run === config.runs ? (
         <div style={{ textAlign: "center" }}>
           <h2 className="text-xl pb-2">Du er ferdig for dagen!</h2>
           <div>
