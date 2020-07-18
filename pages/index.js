@@ -69,6 +69,7 @@ const config = {
         </div>
       ),
       duration: 60 * 2 - 4,
+      incrementRun: true,
     },
   ],
 };
@@ -127,7 +128,8 @@ const reducer = produce((draft, { type, ...rest }) => {
     }
     case "skip": {
       draft.activityIndex = 0;
-      draft.run++;
+      draft.time = 0;
+      draft.progress = 0;
       break;
     }
     case "tick": {
@@ -143,13 +145,17 @@ const reducer = produce((draft, { type, ...rest }) => {
           draft.time = 0;
           draft.progress = 0;
 
+          if (config.activities[draft.activityIndex]?.incrementRun) {
+            draft.run++;
+          }
+
+          // At end
           if (draft.activityIndex > config.activities.length - 1) {
             draft.activityIndex = 0;
-            draft.run++;
+          }
 
-            if (draft.run >= config.runs) {
-              draft.status = "idle";
-            }
+          if (draft.run >= config.runs) {
+            draft.status = "idle";
           }
 
           save(draft);
