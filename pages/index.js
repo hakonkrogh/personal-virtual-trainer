@@ -93,8 +93,13 @@ function Progress({ progress }) {
 
 const reducer = produce((draft, { type, ...rest }) => {
   switch (type) {
-    case "setRun": {
-      draft.run = rest.run;
+    case "resume": {
+      const { run, activityIndex } = rest.state;
+      draft.run = run;
+      draft.activityIndex = activityIndex;
+      draft.time = 0;
+      draft.progress = 0;
+      draft.lastTick = Date.now();
       break;
     }
     case "toggle": {
@@ -149,13 +154,14 @@ const reducer = produce((draft, { type, ...rest }) => {
             draft.run++;
           }
 
-          // At end
+          // At end of single run
           if (draft.activityIndex > config.activities.length - 1) {
             draft.activityIndex = 0;
           }
 
+          // At end of all runs
           if (draft.run >= config.runs) {
-            draft.status = "idle";
+            draft.status = "finished";
           }
 
           save(draft);
@@ -190,7 +196,7 @@ export default function IndexPage() {
         today.getMonth() === oldDay.getMonth() &&
         today.getDate() === oldDay.getDate()
       ) {
-        dispatch({ type: "setRun", run: oldRun.state.run });
+        dispatch({ type: "resume", state: oldRun.state });
       }
     }
 
@@ -205,21 +211,23 @@ export default function IndexPage() {
         <h1 className="title text-white">Personlig Virtuell Trener</h1>
       </div>
       <div className="flex justify-center p-4 space-x-4">
-        <button
-          className="btn-blue w-32"
-          onClick={() => dispatch({ type: "toggle" })}
-        >
-          {status === "idle" && "Start"}
-          {status === "paused" && "Gjenoppta"}
-          {status === "running" && "Pause"}
-        </button>
-        <button
-          className="btn-gray"
-          disabled={status === "idle"}
-          onClick={() => dispatch({ type: "reset" })}
-        >
-          Start på nytt
-        </button>
+        {status !== "finished" ? (
+          <button
+            className="btn-blue w-32"
+            onClick={() => dispatch({ type: "toggle" })}
+          >
+            {status === "idle" && "Start"}
+            {status === "paused" && "Gjenoppta"}
+            {status === "running" && "Pause"}
+          </button>
+        ) : (
+          <button
+            className="btn-gray"
+            onClick={() => dispatch({ type: "reset" })}
+          >
+            Start på nytt
+          </button>
+        )}
       </div>
 
       {run === config.runs ? (
